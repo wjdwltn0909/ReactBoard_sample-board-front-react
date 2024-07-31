@@ -48,6 +48,15 @@ let ShowOne = () => {
         }
     }
 
+    let onDelete = async() => {
+        let response = await axios.get("http://localhost:8080/board/delete/" + id, {withCredentials:true
+        })
+
+        if (response.status === 200) {
+            navigate('/board/showList/1', {state: {userInfo: userInfo}})
+        }
+    }
+
     return (
         <Container className={"mt-3"}>
             <Table striped bordered hover>
@@ -84,7 +93,7 @@ let ShowOne = () => {
                         <Button onClick={onUpdate}>수정하기</Button>
                     </td>
                     <td>
-                        <Button>삭제하기</Button>
+                        <Button onClick={onDelete}>삭제하기</Button>
                     </td>
                 </tr>
                 : null}
