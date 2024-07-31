@@ -1,11 +1,15 @@
 import {Button, Container, FormControl, Table} from "react-bootstrap";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import {useEffect, useState} from "react";
 
 let Update = () => {
     let params = useParams()
     let id = params.id
+
+    let location = useLocation()
+    let userInfo = location.state.userInfo
+
     let [inputs, setInputs] = useState({
         title: '',
         content: ''
@@ -21,20 +25,29 @@ let Update = () => {
 
     let navigate = useNavigate()
     let moveToNext = (id) => {
-        navigate(`/board/showOne/${id}`)
+        navigate(`/board/showOne/${id}`, {state: {userInfo: userInfo}});
     }
 
     let onSubmit = async (e) => {
         e.preventDefault()
-        let resp = await axios.post(`http://localhost:8080/board/update`, inputs)
-        if (resp.status === 200) {
-            moveToNext(resp.data.destId)
+
+        if (inputs.writerId === userInfo.id) {
+            let resp = await axios.post(`http://localhost:8080/board/update`, inputs, {
+                withCredentials: true
+            })
+            if (resp.status===200) {
+                moveToNext(resp.data.destId)
+            }
         }
+        console.log(inputs)
+
     }
 
     useEffect(() => {
         let getUpdate = async () => {
-            let resp = await axios.get('http://localhost:8080/board/showOne/' + id)
+            let resp = await axios.get('http://localhost:8080/board/showOne/' + id, {
+                withCredentials: true
+            })
 
             if (resp.status === 200) {
                 setInputs(resp.data)

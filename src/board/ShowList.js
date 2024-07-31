@@ -1,4 +1,4 @@
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Container, PageItem, Pagination, Row, Table} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,6 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 
 let ShowList = () => {
+    let location = useLocation()
+    let userInfo = location.state.userInfo
+    console.log(userInfo)
+
     let params = useParams()
     let pageNo = params.pageNo
 
@@ -13,21 +17,24 @@ let ShowList = () => {
     let navigate = useNavigate()
 
     let moveToSingle = (id) => {
-        navigate('/board/showOne/' + id)
+        navigate('/board/showOne/' + id, {state: {userInfo: userInfo}})
     }
 
+    // 페이지네이션용
     let moveToPage = (pageNo) => {
-        navigate('/board/showList/' + pageNo)
+        navigate('/board/showList/' + pageNo, {state: {userInfo: userInfo}})
     }
 
     useEffect(() => {
         let selectList = async () => {
 
             let resp = await axios
-                .get("http://localhost:8080/board/showList/" + pageNo, {})
+                .get("http://localhost:8080/board/showList/" + pageNo, {
+                    withCredentials: true
+                })
                 .catch((e) => {
                     console.error(e)
-                    window.location.href = '/board/showList/1'
+                    moveToPage(1)
                 })
 
             if (resp.status === 200) {
